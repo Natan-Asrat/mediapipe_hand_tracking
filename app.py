@@ -9,11 +9,11 @@ class CustomVideoProcessor(VideoTransformerBase):
 
     def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
         img = frame.to_ndarray(format="bgr24")  # Convert to OpenCV format
-        drawn_image = self.detector.findHands(img)
-        return av.VideoFrame.from_ndarray(img, format="bgr24")
+        drawn = self.detector.findHands(img)
+        return av.VideoFrame.from_ndarray(drawn, format="bgr24")
 
 # Main application logic
-st.title("Mediapipe Hand Tracking Live Stream")
+st.title("MediaPipe Hand Tracking Live Stream")
 st.text("Live Hand Tracking  by Natan Asrat.")
 
 # Load the YOLO model

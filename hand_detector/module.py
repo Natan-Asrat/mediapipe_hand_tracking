@@ -21,16 +21,21 @@ class HandTracking():
             min_tracking_confidence=min_tracking_confidence
         )
         self.mpDraw = mp.solutions.drawing_utils
-    def findHands(self, img, draw=True):
+    def findHands(self, img, points=[0], draw=True):
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
         landmarks = self.results.multi_hand_landmarks
         if landmarks and draw:
             for landmark in landmarks:
+                for id, point in enumerate(landmark.landmark):
+                    h, w, c = img.shape
+                    cx, cy = int(point.x * w), int(point.y * h)
+                    if id in points and draw is True :
+                        cv2.circle(img, (cx, cy), 20, (255, 0, 255), cv2.FILLED)
                 
                 self.mpDraw.draw_landmarks(img, landmark, self.mpHands.HAND_CONNECTIONS)
         return img
-    def findPosition(self, img, pointNo=0, draw=True):
+    def findPosition(self, img):
         lmList = []
         landmarks = self.results.multi_hand_landmarks
         if landmarks:
@@ -40,8 +45,7 @@ class HandTracking():
                         h, w, c = img.shape
                         cx, cy = int(point.x * w), int(point.y * h)
                         handList.append([id, cx, cy])
-                        if draw and id == pointNo:
-                            cv2.circle(img, (cx, cy), 20, (255, 0, 255), cv2.FILLED)
+                        
                 lmList.append(handList)
         return lmList
                 
@@ -52,7 +56,7 @@ def main():
     while True:
         success, img = cap.read()
         drawn_img = detector.findHands(img)
-        lmList = detector.findPosition(img)
+        lmList = detector.findPosition(drawn_img)
         if len(lmList) != 0:
             print(lmList)
         cv2.imshow('Image', drawn_img)
